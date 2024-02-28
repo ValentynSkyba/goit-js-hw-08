@@ -63,3 +63,60 @@ const images = [
     description: 'Lighthouse Coast Sea',
   },
 ];
+
+const refs = {
+  container: document.querySelector('.js-gallery'),
+  body: document.body,
+};
+
+// створюємо розмітку для li
+function imgTemplate({ preview, original, description }) {
+  return `<li class="gallery-item">
+  <a class="gallery-link" href="${original}">
+    <img
+      class="gallery-image"
+      src="${preview}"
+      data-source="${original}"
+      alt="${description}"
+    />
+  </a>
+</li>`;
+}
+
+// створюємо масив
+function imagesTemplate(arr) {
+  return arr.map(imgTemplate).join('');
+}
+
+// пушемо массив в html
+function renderImg(arr) {
+  const markup = imagesTemplate(arr);
+  refs.container.innerHTML = markup;
+}
+renderImg(images);
+
+// вішаємо слухача на галерею
+refs.container.addEventListener('click', onContainerClick);
+
+function onContainerClick(e) {
+  e.preventDefault();
+  refs.body.style.overflow = 'hidden';
+  if (e.target === e.currentTarget) return;
+
+  const instance = basicLightbox.create(`
+    <div class="modal">
+        <img class="modal-img" src="${e.target.dataset.source}" alt="${e.target.alt}" />
+    </div>
+`);
+
+  instance.show();
+  document.addEventListener('keydown', onEscClose);
+
+  function onEscClose(e) {
+    if (e.code === 'Escape') {
+      instance.close();
+      refs.body.style.overflow = 'visible';
+      document.removeEventListener('keydown', escClose);
+    }
+  }
+}
