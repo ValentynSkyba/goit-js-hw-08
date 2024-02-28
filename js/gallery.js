@@ -100,7 +100,6 @@ refs.container.addEventListener('click', onContainerClick);
 
 function onContainerClick(e) {
   e.preventDefault();
-  refs.body.style.overflow = 'hidden';
   if (e.target === e.currentTarget) return;
 
   const instance = basicLightbox.create(`
@@ -112,11 +111,18 @@ function onContainerClick(e) {
   instance.show();
   document.addEventListener('keydown', onEscClose);
 
+  // додаємо слухача подій для закриття модального вікна
+  const modalElement = instance.element();
+  modalElement.addEventListener('click', () => {
+    instance.close();
+  });
+
+  // додаємо слухача подій для скидання стилю overflow тіла
   function onEscClose(e) {
+    console.log(onEscClose);
     if (e.code === 'Escape') {
       instance.close();
-      refs.body.style.overflow = 'visible';
-      document.removeEventListener('keydown', escClose);
+      document.removeEventListener('keydown', onEscClose);
     }
   }
 }
